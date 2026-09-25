@@ -76,7 +76,7 @@ Default section order:
 
 ## User Preferences
 
-When the user requests a durable behavior change, record it here or in the relevant child AGENTS.md.
+When the user requests a durable behavior change, record it here or in the relevant child AGENTS.md
 
 ### Product
 
