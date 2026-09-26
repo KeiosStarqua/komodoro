@@ -21,7 +21,7 @@ Rust
 
 Chọn Leptos thay vì Svelte để UI cũng là Rust. Svelte 5 + Tauri vẫn là một stack desktop hợp lý, nhưng không phải stack của repo này. Elixir + Phoenix LiveView hợp để học actor / OTP, không hợp làm app Pomodoro desktop cá nhân.
 
-Driver SQLite (`rusqlite` hoặc `sqlx`) chưa chốt. Core không được phụ thuộc driver nào.
+Driver SQLite đã chốt: **rusqlite** với feature `bundled`. Core không được phụ thuộc driver.
 
 ## Luồng
 
@@ -36,18 +36,23 @@ Driver SQLite (`rusqlite` hoặc `sqlx`) chưa chốt. Core không được ph�
      Tauri IPC
            │
 ┌──────────▼───────────┐
-│      Rust Core       │
+│    src-tauri shell   │
 │                      │
-│  Timer State Machine │
-│  Program interpreter │
-│  Session Manager     │
-│  Notification        │
-│  Global Shortcut     │
-│  Tray                │
+│  Clock / Tray /      │
+│  Shortcut / Notify   │
 └──────────┬───────────┘
            │
 ┌──────────▼───────────┐
-│       SQLite         │
+│   komodoro-core      │
+│                      │
+│  Timer State Machine │
+│  Program interpreter │
+└──────────┬───────────┘
+           │
+┌──────────▼───────────┐
+│  komodoro-storage    │
+│                      │
+│  SQLite (rusqlite)   │
 │                      │
 │  programs            │
 │  sessions            │
