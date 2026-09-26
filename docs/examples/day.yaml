@@ -1,0 +1,16 @@
+day_plan:
+  blocks:
+    - name: Morning
+      items:
+        - activity: Deep Work
+          repeats: 2
+        - activity: Break
+          repeats: 1
+        - activity: Reading
+          repeats: 1
+    - name: Afternoon
+      items:
+        - activity: Coding
+          repeats: 3
+        - activity: Review
+          repeats: 1

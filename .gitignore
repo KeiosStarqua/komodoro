@@ -26,4 +26,5 @@ Thumbs.db
 
 # WASM / frontend build
 /dist/
+/ui/dist/
 /node_modules/

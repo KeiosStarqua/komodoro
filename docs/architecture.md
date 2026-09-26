@@ -117,4 +117,28 @@ enum TimerEvent {
 }
 ```
 
-`Paused` nhớ phase đang dở. `Skip` và `Complete` hỏi program phase kế tiếp. `Tick` chỉ trừ thời gian còn lại của phase hiện tại; hết giờ thì thành `Complete`.
+`Paused` nhớ phase đang dở. `Skip` và `Complete` hỏi program phase kế tiếp. `Tick` chỉ trừ thời gian còn lại của phase hiện tại; hết giờ thì thành `Complete`. Nếu một `Tick` lớn hơn phần còn lại, phase hiện tại kết thúc một lần — thời gian dư không bị cộng sang phase sau.
+
+## Crate
+
+```text
+crates/komodoro-core      FSM, program interpreter, port
+crates/komodoro-storage   rusqlite
+src-tauri                 IPC, clock Tokio, tray, shortcut, notification
+ui                        Leptos CSR, bốn surface
+```
+
+Dependency đi vào trong: `ui` và `src-tauri` dùng core. `komodoro-storage` dùng core. Core không import Tauri, Leptos, hay rusqlite.
+
+## SQLite
+
+Driver đã chốt: **rusqlite** với feature `bundled`. File DB nằm trong app data dir (`komodoro.db`). Bảng: `programs`, `sessions`, `tasks`, `focus_events`, `settings`.
+
+Program lưu dạng JSON của enum `Program`. YAML trong `docs/examples/` là dạng người viết; `Program::parse_source` đọc YAML đó.
+
+## Đọc program
+
+- `rules` thiếu `long_break.duration` thì long break dài 15 phút.
+- `day_plan` thiếu thời lượng thì focus 45 phút, break 10 phút. Activity `Break` / `short break` là `ShortBreak`. Activity `long break` là `LongBreak`. Activity khác là `Focus` mang đúng nhãn đó. Tên block (Morning, Afternoon) không phải state.
+- Cycle và rules lặp. Day plan chạy một lượt rồi về `Idle`.
+- Preset Pomodoro là `Program::pomodoro()`: focus 25 phút, short break 5 phút, long break 15 phút, sau 4 focus session.

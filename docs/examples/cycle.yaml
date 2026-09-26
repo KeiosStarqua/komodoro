@@ -1,0 +1,9 @@
+cycle:
+  - type: focus
+    duration: 45m
+  - type: short_break
+    duration: 10m
+  - type: focus
+    duration: 45m
+  - type: long_break
+    duration: 30m

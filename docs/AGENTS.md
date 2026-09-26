@@ -29,3 +29,4 @@ Owns the durable product and architecture contracts for Komodoro: what the focus
 |------|-------|
 | [`product.md`](product.md) | Focus engine, program forms, surfaces, non-goals |
 | [`architecture.md`](architecture.md) | Locked stack, layers, state machine, SQLite, desktop integration |
+| [`examples/`](examples/) | YAML programs the parser accepts |

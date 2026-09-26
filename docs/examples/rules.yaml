@@ -1,0 +1,8 @@
+rules:
+  focus:
+    duration: 50m
+  break:
+    duration: 10m
+  after:
+    sessions: 3
+    action: long_break

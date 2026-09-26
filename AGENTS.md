@@ -123,3 +123,7 @@ Use GoF patterns when they match a recurring problem — not for decoration. The
 | Path | Scope |
 |------|-------|
 | [`docs/AGENTS.md`](docs/AGENTS.md) | Product definition and architecture contracts |
+| [`crates/komodoro-core/AGENTS.md`](crates/komodoro-core/AGENTS.md) | Pure timer, program interpreter, persistence ports |
+| [`crates/komodoro-storage/AGENTS.md`](crates/komodoro-storage/AGENTS.md) | SQLite adapter |
+| [`src-tauri/AGENTS.md`](src-tauri/AGENTS.md) | Desktop shell: IPC, clock, tray, shortcut, notification |
+| [`ui/AGENTS.md`](ui/AGENTS.md) | Leptos surfaces |

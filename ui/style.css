@@ -1,0 +1,217 @@
+:root {
+  color-scheme: dark;
+  --bg: #141210;
+  --rail: #1b1815;
+  --ink: #f3eee6;
+  --muted: #9c9184;
+  --line: #3a332c;
+  --focus: #e2a04a;
+  --break: #8eae86;
+  --long: #8aa0b5;
+  --notice: #d4786a;
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+button, input, textarea { font: inherit; color: inherit; }
+
+button { cursor: pointer; }
+
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 11rem 1fr;
+  min-height: 100vh;
+}
+
+.rail {
+  background: var(--rail);
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem 0 1rem;
+}
+
+.brand {
+  margin: 0;
+  padding: 0 1rem 1.25rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.rail button {
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-left: 2px solid transparent;
+  color: var(--muted);
+  padding: 0.55rem 1rem;
+}
+
+.rail button[aria-current="page"] {
+  color: var(--ink);
+  border-left-color: var(--focus);
+}
+
+.stage {
+  padding: 1.5rem 2rem 2rem;
+  min-width: 0;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  margin: 0;
+}
+
+.top h1, h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+h2 { margin-top: 1.75rem; }
+
+.phase {
+  margin: 0;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.phase.focus { color: var(--focus); }
+.phase.break { color: var(--break); }
+.phase.long { color: var(--long); }
+
+.program, .meta, .activity, .empty {
+  color: var(--muted);
+}
+
+.activity {
+  min-height: 1.4rem;
+  margin: 0.4rem 0 0;
+}
+
+.clock {
+  margin: 1.25rem 0 0;
+  font-size: 7.25rem;
+  line-height: 0.9;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+  font-weight: 560;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+}
+
+button.primary {
+  background: var(--focus);
+  color: #1a140c;
+  border: 0;
+  padding: 0.7rem 1.3rem;
+}
+
+button.ghost {
+  background: transparent;
+  border: 1px solid var(--line);
+  padding: 0.65rem 0.9rem;
+}
+
+.hidden { display: none; }
+
+.notice {
+  margin: 0 0 1rem;
+  color: var(--notice);
+}
+
+.composer {
+  display: flex;
+  margin-top: 1.25rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.composer input {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  padding: 0.75rem 0;
+}
+
+.composer button {
+  background: transparent;
+  border: 0;
+  border-left: 1px solid var(--line);
+  padding: 0.75rem 1rem;
+}
+
+.rows {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.row span:first-child { flex: 1; }
+
+.row.done span { color: var(--muted); }
+
+.row input[type="checkbox"] { margin: 0; }
+
+.editor {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.8rem;
+  margin-top: 1.25rem;
+}
+
+.editor label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: min(40rem, 100%);
+  color: var(--muted);
+}
+
+.editor input, .editor textarea {
+  background: transparent;
+  border: 1px solid var(--line);
+  padding: 0.6rem 0.7rem;
+}
+
+.editor textarea {
+  min-height: 12rem;
+  resize: vertical;
+  font-family: ui-monospace, monospace;
+  font-size: 0.92rem;
+  color: var(--ink);
+}

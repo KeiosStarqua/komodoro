@@ -1,0 +1,30 @@
+[package]
+name = "komodoro-desktop"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+publish.workspace = true
+description = "Komodoro desktop shell: IPC, clock, tray, shortcut, notification"
+
+[lib]
+name = "komodoro_desktop"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+komodoro-core = { workspace = true }
+komodoro-storage = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tauri = { version = "2", features = ["tray-icon", "image-png"] }
+tauri-plugin-global-shortcut = "2"
+tauri-plugin-notification = "2"
+tokio = { version = "1", features = ["time"] }
+uuid = { workspace = true, features = ["v4"] }
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]
