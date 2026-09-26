@@ -11,6 +11,7 @@ IPC commands, app data path, tray, shortcut, and notification delivery live here
 ## Local Contracts
 
 - Commands are thin wrappers over `runtime`. Do not reimplement transitions in a command.
+- Command functions are `pub`. `generate_handler!` in `lib.rs` cannot see a private `#[tauri::command]`.
 - The clock sends real elapsed milliseconds. It does not assume every wake is exactly one second.
 - `Ctrl+Shift+P` toggles start / pause / resume. Register failure must not stop the app.
 - Notifications, tray, and the shortcut stay in this process. Do not implement them in `ui`.
@@ -20,6 +21,7 @@ IPC commands, app data path, tray, shortcut, and notification delivery live here
 
 - A new surface needs a command here and a view in `ui`. Share the DTO from core.
 - Linux dev needs the Tauri 2 WebKitGTK packages before `cargo tauri dev`.
+- `beforeDevCommand` runs from the repo root. It calls `scripts/ui.sh`, which changes into `ui/` before Trunk.
 
 ## Verification
 

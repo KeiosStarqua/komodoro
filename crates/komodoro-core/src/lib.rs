@@ -9,8 +9,8 @@ mod program;
 mod timer;
 
 pub use model::{
-    AppSettings, Effect, FocusEvent, FocusEventKind, ProgramRecord, Session, StoreError, Task,
-    SETTING_ACTIVE_PROGRAM, SETTING_NOTIFICATIONS,
+    AppSettings, Effect, FocusEvent, FocusEventKind, ProgramRecord, Session, SessionSummary,
+    StoreError, Task, SETTING_ACTIVE_PROGRAM, SETTING_NOTIFICATIONS,
 };
 pub use ports::{ProgramRepository, SessionRepository, SettingsRepository, TaskRepository};
 pub use program::{PhaseKind, PhaseSpec, Program, ProgramCursor, ProgramError};

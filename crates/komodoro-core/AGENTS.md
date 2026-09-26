@@ -2,11 +2,11 @@
 
 ## Purpose
 
-Pure focus engine: program interpreter, timer state machine, and the persistence ports the shell implements.
+Pure focus engine: program interpreter, timer state machine, session summaries, and the persistence ports the shell implements.
 
 ## Ownership
 
-This crate owns phase order, durations, and timer transitions. It does not own the clock, the database, or the pixels.
+This crate owns phase order, durations, timer transitions, and history aggregation. It does not own the clock, the database, or the pixels.
 
 ## Local Contracts
 
@@ -17,6 +17,7 @@ This crate owns phase order, durations, and timer transitions. It does not own t
 - Leftover milliseconds on an oversized tick are dropped. They are not applied to the following phase.
 - Cycles and rules loop. A day plan runs once, then the timer returns to `Idle`.
 - Repository traits in `ports` are the only persistence API. Errors are `StoreError`, not a driver error.
+- `SessionSummary::since` aggregates a session list behind a caller-supplied boundary. Focused time counts completed focus sessions only; skipped and interrupted sessions add none.
 
 ## Work Guidance
 

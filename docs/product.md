@@ -65,7 +65,7 @@ Preset Pomodoro (25 phút focus, 5 phút short break, long break sau một số 
 |---------|------|
 | Timer | Phase hiện tại, thời gian còn lại, start / pause / resume / skip |
 | Tasks | Việc gắn với session |
-| Stats | Lịch sử focus |
+| Stats | Lịch sử focus, tổng hợp theo ngày |
 | Settings | Program, shortcut, notification |
 
 ## Ngoài phạm vi lúc này

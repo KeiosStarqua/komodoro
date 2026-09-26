@@ -4,9 +4,9 @@
   "version": "0.1.0",
   "identifier": "app.komodoro.desktop",
   "build": {
-    "beforeDevCommand": "sh ../scripts/ui.sh serve",
+    "beforeDevCommand": "sh scripts/ui.sh serve",
     "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "sh ../scripts/ui.sh build",
+    "beforeBuildCommand": "sh scripts/ui.sh build",
     "frontendDist": "../ui/dist"
   },
   "app": {

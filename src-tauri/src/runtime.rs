@@ -39,7 +39,18 @@ pub fn init(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
             let now = std::time::Instant::now();
             let elapsed = now.duration_since(last).as_millis() as u64;
             last = now;
-            if elapsed > 0 {
+            let running = handle
+                .state::<Desktop>()
+                .engine
+                .lock()
+                .map(|engine| {
+                    matches!(
+                        engine.state(),
+                        TimerState::Focus(_) | TimerState::ShortBreak(_) | TimerState::LongBreak(_)
+                    )
+                })
+                .unwrap_or(false);
+            if elapsed > 0 && running {
                 let _ = dispatch_timer(
                     &handle,
                     TimerEvent::Tick {
@@ -204,7 +215,7 @@ fn apply_effects(
     effects: Vec<Effect>,
 ) -> Result<(), String> {
     let now = now_ms();
-    let notify = notifications_on(desktop)?;
+    let mut notify_enabled: Option<bool> = None;
     for effect in effects {
         match effect {
             Effect::OpenSession { phase, label } => {
@@ -265,7 +276,15 @@ fn apply_effects(
                 }
             }
             Effect::Notify { title, body } => {
-                if notify {
+                let enabled = match notify_enabled {
+                    Some(value) => value,
+                    None => {
+                        let value = notifications_on(desktop)?;
+                        notify_enabled = Some(value);
+                        value
+                    }
+                };
+                if enabled {
                     notify_user(app, &title, &body);
                 }
             }

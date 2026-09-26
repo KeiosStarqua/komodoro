@@ -66,10 +66,16 @@ pub async fn set_notifications(enabled: bool) -> Result<(), String> {
     .await
 }
 
+/// Bridge through JSON text: `invoke` receives a plain JS object, and the reply
+/// is parsed by `serde_json`, so 64-bit fields round-trip like they do in Rust.
 async fn call<T: DeserializeOwned>(cmd: &str, args: &Value) -> Result<T, String> {
-    let args = serde_wasm_bindgen::to_value(args).map_err(|err| err.to_string())?;
-    let value = invoke(cmd, args).await.map_err(js_error)?;
-    serde_wasm_bindgen::from_value(value).map_err(|err| err.to_string())
+    let args = js_sys::JSON::parse(&args.to_string()).map_err(|err| format!("{err:?}"))?;
+    let reply = invoke(cmd, args).await.map_err(js_error)?;
+    let text = js_sys::JSON::stringify(&reply)
+        .map_err(|err| format!("{err:?}"))?
+        .as_string()
+        .ok_or_else(|| format!("{cmd} returned a value JSON cannot express"))?;
+    serde_json::from_str(&text).map_err(|err| err.to_string())
 }
 
 fn js_error(value: JsValue) -> String {

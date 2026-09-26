@@ -31,26 +31,17 @@ enum Tab {
 pub fn App() -> impl IntoView {
     let snapshot = RwSignal::new(None::<AppSnapshot>);
     let notice = RwSignal::new(String::new());
-    let connected = RwSignal::new(true);
     let tab = RwSignal::new(Tab::Timer);
     provide_context(Shell { snapshot, notice });
 
     let poll = move || {
-        if !connected.get_untracked() {
-            return;
-        }
         spawn_local(async move {
             match ipc::snapshot().await {
                 Ok(value) => {
                     snapshot.set(Some(value));
                     notice.set(String::new());
                 }
-                Err(err) => {
-                    connected.set(false);
-                    if snapshot.get_untracked().is_none() {
-                        notice.set(err);
-                    }
-                }
+                Err(err) => notice.set(err),
             }
         });
     };
