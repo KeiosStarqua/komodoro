@@ -1,0 +1,122 @@
+name: tauri-publish
+description: Build Komodoro with Trunk + Tauri 2 and upload bundles to a GitHub Release.
+
+inputs:
+  github-token:
+    description: Token with contents:write so assets can be uploaded.
+    required: true
+  tag-name:
+    description: Git tag of the GitHub Release to create or attach to.
+    required: true
+  release-name:
+    description: Display name of the GitHub Release.
+    required: true
+  release-body:
+    description: Markdown body of the GitHub Release.
+    required: true
+  prerelease:
+    description: '"true" marks the GitHub Release as a prerelease.'
+    required: true
+  release-id:
+    description: Existing GitHub Release id. When set, tag-name is only used as fallback.
+    required: false
+    default: ''
+  app-version:
+    description: Override src-tauri/tauri.conf.json version (semver). Empty keeps the file as-is.
+    required: false
+    default: ''
+  args:
+    description: Extra arguments forwarded to `tauri build`.
+    required: false
+    default: ''
+  rust-targets:
+    description: Comma-separated rustup targets. Always include wasm32-unknown-unknown.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Put Git bash on PATH (Windows)
+      if: runner.os == 'Windows'
+      shell: bash
+      run: echo "$PROGRAMFILES/Git/bin" >> "$GITHUB_PATH"
+
+    - name: Install Linux packages
+      if: runner.os == 'Linux'
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          libwebkit2gtk-4.1-dev \
+          libappindicator3-dev \
+          libayatana-appindicator3-dev \
+          librsvg2-dev \
+          patchelf \
+          xdg-utils \
+          libxdo-dev \
+          libssl-dev \
+          libdbus-1-dev \
+          pkg-config \
+          libfuse2 \
+          file \
+          build-essential
+
+    - name: Install Rust stable
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: ${{ inputs.rust-targets }}
+
+    - name: Cache Rust
+      uses: swatinem/rust-cache@v2
+      with:
+        workspaces: '. -> target'
+        cache-on-failure: true
+
+    - name: Install Trunk and Tauri CLI
+      uses: taiki-e/install-action@v2
+      with:
+        tool: trunk,tauri-cli@2
+
+    - name: Set bundle version
+      if: inputs.app-version != ''
+      shell: bash
+      env:
+        APP_VERSION: ${{ inputs.app-version }}
+      run: |
+        python3 -c "import json,os,pathlib; p=pathlib.Path('src-tauri/tauri.conf.json'); d=json.loads(p.read_text()); d['version']=os.environ['APP_VERSION']; p.write_text(json.dumps(d, indent=2)+chr(10)); print('tauri.conf.json version ->', d['version'])"
+
+    - name: Build and upload to existing release
+      if: inputs.release-id != ''
+      uses: tauri-apps/tauri-action@v1
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+        TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+      with:
+        projectPath: .
+        tauriScript: tauri
+        releaseId: ${{ inputs.release-id }}
+        args: ${{ inputs.args }}
+        retryAttempts: '5'
+        uploadUpdaterJson: false
+        uploadWorkflowArtifacts: true
+
+    - name: Build and upload by tag
+      if: inputs.release-id == ''
+      uses: tauri-apps/tauri-action@v1
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+        TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+      with:
+        projectPath: .
+        tauriScript: tauri
+        tagName: ${{ inputs.tag-name }}
+        releaseName: ${{ inputs.release-name }}
+        releaseBody: ${{ inputs.release-body }}
+        releaseDraft: false
+        prerelease: ${{ inputs.prerelease }}
+        args: ${{ inputs.args }}
+        retryAttempts: '5'
+        uploadUpdaterJson: false
+        uploadWorkflowArtifacts: true

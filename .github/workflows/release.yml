@@ -1,0 +1,113 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: Kênh phát hành
+        required: true
+        type: choice
+        options:
+          - stable
+          - beta
+        default: beta
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  meta:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.compute.outputs.tag }}
+      name: ${{ steps.compute.outputs.name }}
+      body: ${{ steps.compute.outputs.body }}
+      prerelease: ${{ steps.compute.outputs.prerelease }}
+      version: ${{ steps.compute.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: compute
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          DISPATCH_CHANNEL: ${{ inputs.channel }}
+          REF_NAME: ${{ github.ref_name }}
+          RUN_NUMBER: ${{ github.run_number }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          version=$(python3 -c "import json; print(json.load(open('src-tauri/tauri.conf.json'))['version'])")
+
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            channel="$DISPATCH_CHANNEL"
+            if [ "$channel" = "stable" ]; then
+              tag="v${version}"
+              prerelease=false
+            else
+              base="${version%%-*}"
+              tag="v${base}-beta.${RUN_NUMBER}"
+              prerelease=true
+            fi
+          else
+            tag="$REF_NAME"
+            if [[ "$tag" == *-* ]]; then
+              prerelease=true
+            else
+              prerelease=false
+            fi
+          fi
+
+          app_version="${tag#v}"
+          if [ "$prerelease" = "true" ]; then
+            body="Bản **Beta** \`${tag}\` (\`${SHA:0:7}\`). Dùng để test; chưa phải kênh Stable."
+          else
+            body="Bản **Stable** \`${tag}\` (\`${SHA:0:7}\`)."
+          fi
+
+          {
+            echo "tag=${tag}"
+            echo "name=Komodoro ${tag}"
+            echo "prerelease=${prerelease}"
+            echo "version=${app_version}"
+            echo "body<<EOF"
+            echo "${body}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+  publish:
+    needs: meta
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-latest
+            rust_targets: wasm32-unknown-unknown,aarch64-apple-darwin
+            args: --target aarch64-apple-darwin
+          - platform: ubuntu-22.04
+            rust_targets: wasm32-unknown-unknown
+            args: ''
+          - platform: windows-latest
+            rust_targets: wasm32-unknown-unknown
+            args: ''
+    runs-on: ${{ matrix.platform }}
+    env:
+      TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+      TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/tauri-publish
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          tag-name: ${{ needs.meta.outputs.tag }}
+          release-name: ${{ needs.meta.outputs.name }}
+          release-body: ${{ needs.meta.outputs.body }}
+          prerelease: ${{ needs.meta.outputs.prerelease }}
+          app-version: ${{ needs.meta.outputs.version }}
+          args: ${{ matrix.args }}
+          rust-targets: ${{ matrix.rust_targets }}

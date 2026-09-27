@@ -126,3 +126,4 @@ Use GoF patterns when they match a recurring problem — not for decoration. The
 | [`crates/AGENTS.md`](crates/AGENTS.md) | Library crates: pure engine and SQLite adapter |
 | [`src-tauri/AGENTS.md`](src-tauri/AGENTS.md) | Desktop shell: IPC, clock, tray, shortcut, notification |
 | [`ui/AGENTS.md`](ui/AGENTS.md) | Leptos surfaces |
+| [`.github/AGENTS.md`](.github/AGENTS.md) | CI and GitHub Release channels |

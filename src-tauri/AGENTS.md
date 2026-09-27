@@ -22,6 +22,7 @@ IPC commands, app data path, tray, shortcut, and notification delivery live here
 - A new surface needs a command here and a view in `ui`. Share the DTO from core.
 - Linux dev needs the Tauri 2 WebKitGTK packages before `cargo tauri dev`.
 - `beforeDevCommand` runs from the repo root. It calls `scripts/ui.sh`, which changes into `ui/` before Trunk.
+- CI publishes bundles from `.github/actions/tauri-publish`. macOS uses ad-hoc `signingIdentity: "-"` until Apple certificates exist. In-app updater is not part of this crate yet.
 
 ## Verification
 

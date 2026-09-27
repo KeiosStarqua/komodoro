@@ -8,6 +8,7 @@ Focus engine lập trình được, chạy native và local-first. Pomodoro cổ
 |----------|----------|
 | [docs/product.md](docs/product.md) | Engine, ba dạng program, bề mặt app |
 | [docs/architecture.md](docs/architecture.md) | Layer, state machine, SQLite, tray / shortcut |
+| [docs/releases.md](docs/releases.md) | GitHub Releases: Stable, Beta, Nightly |
 
 Giấy phép [MIT](LICENSE).
 
@@ -32,6 +33,8 @@ sudo apt install libwebkit2gtk-4.1-dev build-essential curl wget file \
 ```
 
 `cargo test` chạy core và storage. UI build bằng Trunk, không bằng `cargo run`.
+
+Đóng gói local: `cargo tauri build`. Ba kênh GitHub Release (Stable / Beta / Nightly): [docs/releases.md](docs/releases.md).
 
 | Path | Việc |
 |------|------|
