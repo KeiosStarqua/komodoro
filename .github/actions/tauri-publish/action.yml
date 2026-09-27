@@ -48,7 +48,6 @@ runs:
         sudo apt-get update
         sudo apt-get install -y \
           libwebkit2gtk-4.1-dev \
-          libappindicator3-dev \
           libayatana-appindicator3-dev \
           librsvg2-dev \
           patchelf \
@@ -72,10 +71,27 @@ runs:
         workspaces: '. -> target'
         cache-on-failure: true
 
-    - name: Install Trunk and Tauri CLI
+    - name: Install Trunk and cargo-binstall
       uses: taiki-e/install-action@v2
       with:
-        tool: trunk,tauri-cli@2
+        tool: trunk,cargo-binstall
+
+    - name: Install Tauri CLI
+      shell: bash
+      run: |
+        set -euo pipefail
+        host=$(rustc -vV | awk '/^host: / { print $2 }')
+        args=(--no-confirm --targets "$host")
+        # Published crates.io metadata marks only x86_64 mac/Windows as zip.
+        # aarch64 release assets are zip too; the default tgz makes binstall
+        # fall back to the x86_64 binary.
+        case "$host" in
+          aarch64-apple-darwin|aarch64-pc-windows-msvc)
+            args+=(--pkg-fmt zip)
+            ;;
+        esac
+        cargo binstall "${args[@]}" 'tauri-cli@^2'
+        cargo tauri --version
 
     - name: Set bundle version
       if: inputs.app-version != ''
@@ -94,7 +110,7 @@ runs:
         TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
       with:
         projectPath: .
-        tauriScript: tauri
+        tauriScript: cargo tauri
         releaseId: ${{ inputs.release-id }}
         args: ${{ inputs.args }}
         retryAttempts: '5'
@@ -110,7 +126,7 @@ runs:
         TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
       with:
         projectPath: .
-        tauriScript: tauri
+        tauriScript: cargo tauri
         tagName: ${{ inputs.tag-name }}
         releaseName: ${{ inputs.release-name }}
         releaseBody: ${{ inputs.release-body }}

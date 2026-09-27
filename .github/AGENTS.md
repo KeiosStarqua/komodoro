@@ -12,8 +12,9 @@ Workflows and the shared Tauri publish action live here. Timer rules stay in `ko
 
 - `workflows/ci.yml` runs `cargo test`. It does not bundle the desktop app.
 - Release jobs use `.github/actions/tauri-publish`. Frontend is Trunk / Leptos (`scripts/ui.sh build`). Do not add npm to the publish path.
+- `tauriScript` is `cargo tauri`. cargo-binstall installs `cargo-tauri`, not a `tauri` binary. On Apple Silicon, pass `--pkg-fmt zip` so binstall does not fall back to the x86_64 CLI.
 - Every publish runner needs `wasm32-unknown-unknown` because `beforeBuildCommand` compiles the UI to WASM.
-- Linux images need WebKitGTK 4.1 and `libxdo` (global shortcut).
+- Linux images need WebKitGTK 4.1, `libayatana-appindicator3-dev`, and `libxdo` (global shortcut). Do not also install `libappindicator3-dev`; it conflicts with the ayatana package.
 - **Stable**: git tag `vX.Y.Z` → GitHub Release, latest. **Beta**: tag `vX.Y.Z-beta.N` → prerelease. **Nightly**: rolling tag `nightly`, always prerelease, never latest.
 - `uploadUpdaterJson` stays false until updater signing exists. Do not commit `TAURI_SIGNING_PRIVATE_KEY`.
 
