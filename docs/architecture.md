@@ -66,7 +66,7 @@ UI gửi `TimerEvent` và vẽ state trả về. UI không đếm ngược.
 
 Notification, global shortcut (ví dụ `Ctrl+Shift+P`), và tray thuộc adapter Tauri để session chạy nền. Không làm các thứ này trong webview.
 
-Đóng gói bằng Tauri 2: `.deb`, `.AppImage`, `.dmg`, `.msi`.
+Đóng gói bằng Tauri 2: `.deb`, `.AppImage`, `.dmg`, `.msi`. Phát hành qua GitHub Releases, ba kênh: Stable (`vX.Y.Z`), Beta (`vX.Y.Z-beta.N`), Nightly (tag rolling `nightly`). Chi tiết: [`releases.md`](releases.md). Cập nhật trong app (Tauri updater) là issue riêng, không nằm trong pipeline publish.
 
 ## Core thuần
 

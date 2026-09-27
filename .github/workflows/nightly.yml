@@ -1,0 +1,100 @@
+name: nightly
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'src-tauri/**'
+      - 'ui/**'
+      - 'crates/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'scripts/**'
+      - '.github/actions/tauri-publish/**'
+      - '.github/workflows/nightly.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nightly-release
+  cancel-in-progress: true
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      release_id: ${{ steps.create.outputs.id }}
+      version: ${{ steps.meta.outputs.version }}
+      body: ${{ steps.meta.outputs.body }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: meta
+        env:
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          stamp=$(date -u +%Y%m%d%H%M)
+          version=$(python3 -c "import json; print(json.load(open('src-tauri/tauri.conf.json'))['version'].split('-', 1)[0])")
+          app_version="${version}-nightly.${stamp}"
+          {
+            echo "version=${app_version}"
+            echo "body<<EOF"
+            echo "Bản **Nightly** \`${app_version}\` từ \`main\` (\`${SHA:0:7}\`)."
+            echo
+            echo "Chỉ dùng để test. Release này bị ghi đè mỗi lần nightly chạy."
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - id: create
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.meta.outputs.version }}
+          BODY: ${{ steps.meta.outputs.body }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          gh release delete nightly --yes --cleanup-tag || true
+          gh release create nightly \
+            --prerelease \
+            --target "${SHA}" \
+            --title "Komodoro Nightly ${VERSION}" \
+            --notes "${BODY}"
+          id=$(gh release view nightly --json databaseId --jq .databaseId)
+          echo "id=${id}" >> "$GITHUB_OUTPUT"
+
+  publish:
+    needs: prepare
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-latest
+            rust_targets: wasm32-unknown-unknown,aarch64-apple-darwin
+            args: --target aarch64-apple-darwin
+          - platform: ubuntu-22.04
+            rust_targets: wasm32-unknown-unknown
+            args: ''
+          - platform: windows-latest
+            rust_targets: wasm32-unknown-unknown
+            args: ''
+    runs-on: ${{ matrix.platform }}
+    env:
+      TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+      TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/tauri-publish
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          tag-name: nightly
+          release-name: Komodoro Nightly ${{ needs.prepare.outputs.version }}
+          release-body: ${{ needs.prepare.outputs.body }}
+          prerelease: 'true'
+          release-id: ${{ needs.prepare.outputs.release_id }}
+          app-version: ${{ needs.prepare.outputs.version }}
+          args: ${{ matrix.args }}
+          rust-targets: ${{ matrix.rust_targets }}

@@ -8,6 +8,7 @@ Owns the durable product and architecture contracts for Komodoro: what the focus
 
 - Product shape, program forms, and surfaces live in [`product.md`](product.md)
 - Stack, layering, timer state machine, and persistence live in [`architecture.md`](architecture.md)
+- GitHub Release channels live in [`releases.md`](releases.md)
 - Root [`AGENTS.md`](../AGENTS.md) holds repo-wide DOX rules, the stack lock, and architecture principles
 - [`README.md`](../README.md) stays a short entry point and links here
 
@@ -29,4 +30,5 @@ Owns the durable product and architecture contracts for Komodoro: what the focus
 |------|-------|
 | [`product.md`](product.md) | Focus engine, program forms, surfaces, non-goals |
 | [`architecture.md`](architecture.md) | Locked stack, layers, state machine, SQLite, desktop integration |
+| [`releases.md`](releases.md) | GitHub Release channels: Stable, Beta, Nightly |
 | [`examples/`](examples/) | YAML programs the parser accepts |
